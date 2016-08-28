@@ -15,14 +15,14 @@ $(KERNEL_OUT):
 	mkdir -p $(KERNEL_OUT)
 
 $(KERNEL_CONFIG): $(TARGET_KERNEL_SOURCE)/arch/arm/configs/$(KERNEL_DEFCONFIG)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-eabi-" $(KERNEL_DEFCONFIG)
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-linux-androideabi-" $(KERNEL_DEFCONFIG)
 
 $(TARGET_PREBUILT_KERNEL): $(KERNEL_OUT) $(KERNEL_CONFIG)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-eabi-" headers_install
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-eabi-" zImage -j4
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-eabi-" modules
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-linux-androideabi-" headers_install
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-linux-androideabi-" zImage -j4
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-linux-androideabi-" modules
 	@-mkdir -p $(KERNEL_MODULES_OUT)
 	@-find $(KERNEL_OUT) -name *.ko | xargs -I{} cp {} $(KERNEL_MODULES_OUT)
 
 kernelheader: $(KERNEL_OUT)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-eabi-" headers_install
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="ccache arm-linux-androideabi-" headers_install
