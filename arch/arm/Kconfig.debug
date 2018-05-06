@@ -721,4 +721,88 @@ config PID_IN_CONTEXTIDR
 	  additional instructions during context switch. Say Y here only if you
 	  are planning to use hardware trace tools with this kernel.
 
+config SPRD_DEBUG
+	bool "Enable SPRD DEBUG"
+
+config SPRD_DEBUG_SCHED_LOG
+	bool "SPRD Scheduler Logging Feature"
+	depends on SPRD_DEBUG
+	default n
+	help
+	  SPRD Scheduler Logging Feature for Debug use.
+
+config SEC_DEBUG
+	bool "Samsung TN Ramdump Feature"
+	help
+	  Samsung TN Ramdump Feature.
+
+if SEC_DEBUG
+config SEC_DEBUG_SCHED_LOG
+	bool "Samsung Scheduler Logging Feature"
+	default n
+	help
+	  Samsung Scheduler Logging Feature for Debug use.
+
+config SEC_DEBUG_USER
+	bool "Panic on Userspace fault"
+	default n
+	help
+	  Panic on Userspace fault
+	  
+config USER_RESET_DEBUG
+	bool "Reset reason debug feature in user version"
+	default n
+	help
+	  This option provides reset history log in user version.
+	  This option enable proc/reset_reason support
+
+config SEC_LOG
+        bool "Samsung log buffer"
+        default n
+
+config SEC_LOG_LAST_KMSG
+        bool "Samsung Use Sec Log Last Kmsg"
+        depends on SEC_LOG
+        default n
+        help
+           This feature creats a node to read contents of sec_log_buf
+           area just before booting into kernel from bootloader.
+           This is very helpful to read sec_log_buf area without reset
+           or entering upload mode.
+
+endif
+
+comment "Samsung Rooting Restriction Feature"
+config SEC_RESTRICT_ROOTING
+	bool "Samsung Rooting Restriction Feature"
+	default n
+	help
+	  Restrict unauthorized executions with root permission.
+
+config SEC_RESTRICT_SETUID
+	bool "Restrict changing root privilege except allowed process"
+	depends on SEC_RESTRICT_ROOTING
+	default y
+	help
+	  Say Y here if you want to restrict functions related setuid. Only allowed
+	  process can chanage ROOT privilege. Saying N will not restrict changing
+	  permission.
+
+config SEC_RESTRICT_FORK
+	bool "Restrict forking process except allowed process"
+	depends on SEC_RESTRICT_ROOTING
+	default y
+	help
+	  Say Y here if you want to restrict function related fork. Process matched
+	  special condition will be not forked. Saying N will not restrict forking
+	  process.
+
+config SEC_RESTRICT_ROOTING_LOG
+	bool "Print restricted result to kernel log"
+	depends on SEC_RESTRICT_ROOTING
+	default n
+	help
+	   Say Y here if you want to see result of restricting SETUID or FORK. It will
+	   be displayed by kernel error log. Saying N will not be displayed anything.
+ 
 endmenu
