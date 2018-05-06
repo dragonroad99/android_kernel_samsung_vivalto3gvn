@@ -18,6 +18,28 @@ config MFD_CS5535
 	  This is the core driver for CS5535/CS5536 MFD functions.  This is
           necessary for using the board's GPIO and MFGPT functionality.
 
+config MFD_RT8973
+	tristate "Richtek RT8973 MUIC"
+	depends on I2C
+	default n
+	help
+	  Support RT8973 MUIC
+
+config SAMSUNG_MUIC_RT8973
+	bool "SAMSUNG_MUIC_RT8973"
+	depends on MFD_RT8973
+	default n
+        help
+          Support for SAMSUNG MUIC
+
+config MUIC_FACTORY_EVENT
+	bool "MUIC_FACTORY_EVENT"
+	depends on SWITCH && SAMSUNG_MUIC_RT8973
+	default n
+        help
+          Support for SAMSUNG MUIC FACTORY
+
+
 config MFD_AS3711
 	bool "AMS AS3711"
 	select MFD_CORE
@@ -26,6 +48,22 @@ config MFD_AS3711
 	depends on I2C=y && GENERIC_HARDIRQS
 	help
 	  Support for the AS3711 PMIC from AMS
+
+config MFD_RT5033
+        tristate "Support for Richtek RT5033 I/F PMIC"
+	depends on I2C
+	select MFD_CORE
+	default n
+	help
+	  If you say yes to this option, support will be included for the
+	  RT5033 I/F PMIC chip.
+
+config MFD_RT5033_USE_DT
+	bool "Use device tree"
+	depends on MFD_RT5033 && OF
+	default n
+	help
+	  Check this to support device tree.
 
 config PMIC_ADP5520
 	bool "Analog Devices ADP5520/01 MFD PMIC Core Support"

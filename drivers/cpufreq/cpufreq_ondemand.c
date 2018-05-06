@@ -25,13 +25,18 @@
 #include <linux/tick.h>
 #include <linux/types.h>
 #include <linux/cpu.h>
-
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+#include <linux/earlysuspend.h>
+#include <linux/suspend.h>
+#endif
 #include "cpufreq_governor.h"
 
 /* On-demand governor macros */
+#define DEF_FREQUENCY_DOWN_DIFFERENTIAL		(10)
 #define DEF_FREQUENCY_UP_THRESHOLD		(80)
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(100000)
+#define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
 #define MICRO_FREQUENCY_UP_THRESHOLD		(95)
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
@@ -43,6 +48,10 @@ static struct od_ops od_ops;
 
 #ifndef CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND
 static struct cpufreq_governor cpufreq_gov_ondemand;
+#endif
+
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+static unsigned long ondemand;
 #endif
 
 static unsigned int default_powersave_bias;
@@ -209,12 +218,21 @@ static void od_dbs_timer(struct work_struct *work)
 	unsigned int cpu = dbs_info->cdbs.cur_policy->cpu;
 	struct od_cpu_dbs_info_s *core_dbs_info = &per_cpu(od_cpu_dbs_info,
 			cpu);
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+	struct cpufreq_policy *policy = core_dbs_info->cdbs.cur_policy;
+#endif
 	struct dbs_data *dbs_data = dbs_info->cdbs.cur_policy->governor_data;
 	struct od_dbs_tuners *od_tuners = dbs_data->tuners;
 	int delay = 0, sample_type = core_dbs_info->sample_type;
 	bool modify_all = true;
 
 	mutex_lock(&core_dbs_info->cdbs.timer_mutex);
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+	if(!ondemand) {
+		dbs_freq_increase(policy, policy->max);
+		goto max_delay;
+	}
+#endif
 	if (!need_load_eval(&core_dbs_info->cdbs, od_tuners->sampling_rate)) {
 		modify_all = false;
 		goto max_delay;
@@ -618,13 +636,41 @@ struct cpufreq_governor cpufreq_gov_ondemand = {
 	.owner			= THIS_MODULE,
 };
 
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+static void ondemand_gov_early_suspend(struct early_suspend *h)
+{
+	ondemand = 1;
+	pr_info("%s do nothing\n", __func__);
+	return;
+}
+
+static void ondemand_gov_late_resume(struct early_suspend *h)
+{
+	ondemand = 0;
+	pr_info("%s do nothing\n", __func__);
+	return;
+}
+
+static struct early_suspend ondemand_gov_earlysuspend_handler = {
+	.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN,
+	.suspend = ondemand_gov_early_suspend,
+	.resume = ondemand_gov_late_resume,
+};
+#endif
+
 static int __init cpufreq_gov_dbs_init(void)
 {
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+	register_early_suspend(&ondemand_gov_earlysuspend_handler);
+#endif
 	return cpufreq_register_governor(&cpufreq_gov_ondemand);
 }
 
 static void __exit cpufreq_gov_dbs_exit(void)
 {
+#ifdef CONFIG_CPU_FREQ_EARLYSUSPEND
+	unregister_early_suspend(&ondemand_gov_earlysuspend_handler);
+#endif
 	cpufreq_unregister_governor(&cpufreq_gov_ondemand);
 }
 

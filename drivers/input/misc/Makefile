@@ -62,3 +62,7 @@ obj-$(CONFIG_INPUT_WISTRON_BTNS)	+= wistron_btns.o
 obj-$(CONFIG_INPUT_WM831X_ON)		+= wm831x-on.o
 obj-$(CONFIG_INPUT_XEN_KBDDEV_FRONTEND)	+= xen-kbdfront.o
 obj-$(CONFIG_INPUT_YEALINK)		+= yealink.o
+obj-$(CONFIG_INPUT_LTR558_I2C)		+= ltr_558als.o
+obj-$(CONFIG_INPUT_LIS3DH_I2C)          += lis3dh.o
+obj-$(CONFIG_INPUT_SPRD_HEADSET_SHARK)  += headset_sprd.o
+obj-$(CONFIG_INPUT_SPRD_CALI_HEADSET)     += headset_sprd_cali.o

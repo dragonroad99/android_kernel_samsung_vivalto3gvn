@@ -14,6 +14,7 @@ source "fs/ext2/Kconfig"
 source "fs/ext3/Kconfig"
 source "fs/ext4/Kconfig"
 
+
 config FS_XIP
 # execute in place
 	bool
@@ -92,6 +93,7 @@ if BLOCK
 menu "DOS/FAT/NT Filesystems"
 
 source "fs/fat/Kconfig"
+source "fs/exfat/Kconfig"
 source "fs/ntfs/Kconfig"
 
 endmenu
@@ -268,5 +270,11 @@ endif # NETWORK_FILESYSTEMS
 
 source "fs/nls/Kconfig"
 source "fs/dlm/Kconfig"
+
+config IOSCHED_CLASS_CONTROL
+	bool
+	default n
+	help
+	  I/O sched class control
 
 endmenu

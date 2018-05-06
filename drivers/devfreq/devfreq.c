@@ -42,6 +42,7 @@ static LIST_HEAD(devfreq_governor_list);
 static LIST_HEAD(devfreq_list);
 static DEFINE_MUTEX(devfreq_list_lock);
 
+#define SCXX30_COMPARE_FREQ (200000)									//zzq
 /**
  * find_device_devfreq() - find devfreq struct using device pointer
  * @dev:	device pointer used to lookup device devfreq.
@@ -184,6 +185,13 @@ int update_devfreq(struct devfreq *devfreq)
 		flags |= DEVFREQ_FLAG_LEAST_UPPER_BOUND; /* Use LUB */
 	}
 
+#if defined(CONFIG_SS_KEEP_DDRMAX)
+	if(freq > 192000)
+		devfreq->keep_maxfreq = true;
+	else
+		devfreq->keep_maxfreq = false;
+#endif	
+
 	err = devfreq->profile->target(devfreq->dev.parent, &freq, flags);
 	if (err)
 		return err;
@@ -214,8 +222,21 @@ static void devfreq_monitor(struct work_struct *work)
 	if (err)
 		dev_err(&devfreq->dev, "dvfs failed with (%d) error\n", err);
 
+#if defined(CONFIG_SS_KEEP_DDRMAX)
+	if(devfreq->keep_maxfreq == true)
+	{
+		queue_delayed_work(devfreq_wq, &devfreq->work,
+			msecs_to_jiffies(devfreq->profile->polling_ms_for_maxfreq));
+	}
+	else
+	{
 	queue_delayed_work(devfreq_wq, &devfreq->work,
 				msecs_to_jiffies(devfreq->profile->polling_ms));
+	}
+#else
+	queue_delayed_work(devfreq_wq, &devfreq->work,
+				msecs_to_jiffies(devfreq->profile->polling_ms));
+#endif
 	mutex_unlock(&devfreq->lock);
 }
 

@@ -54,3 +54,23 @@ obj-$(CONFIG_POWER_AVS)		+= avs/
 obj-$(CONFIG_CHARGER_SMB347)	+= smb347-charger.o
 obj-$(CONFIG_CHARGER_TPS65090)	+= tps65090-charger.o
 obj-$(CONFIG_POWER_RESET)	+= reset/
+obj-$(CONFIG_STC3115_FUELGAUGE) += stc3115_battery.o
+ifeq ($(CONFIG_STC3117_FUELGAUGE),y)
+ifdef CONFIG_MACH_VIVALTO
+obj-y += stc3117_battery.o
+endif
+ifdef CONFIG_MACH_HIGGS
+obj-y += stc3117_battery.o
+endif
+ifdef CONFIG_MACH_POCKET2
+obj-y += stc3117_battery.o
+endif
+ifdef CONFIG_MACH_YOUNG2
+obj-y += stc3117_battery.o
+endif
+endif
+obj-$(CONFIG_SEC_CHARGING_FEATURE)	+= spa_power.o spa_ps.o spa_agent.o
+obj-$(CONFIG_SPRD_2713_POWER)  += sprd_2713_battery.o
+sprd_2713_battery-y := sprd_2713_power.o sprd_2713_charge.o sprd_2713_fgu.o
+obj-$(CONFIG_FUELGAUGE_RT5033)	+= rt5033_fuelgauge.o
+obj-$(CONFIG_CHARGER_RT5033)    += rt5033_charger.o

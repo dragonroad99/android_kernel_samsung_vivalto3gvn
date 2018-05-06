@@ -1,5 +1,7 @@
 menu "Device Drivers"
 
+source "drivers/gator/Kconfig"
+
 source "drivers/base/Kconfig"
 
 source "drivers/bus/Kconfig"
@@ -67,6 +69,8 @@ source "drivers/gpio/Kconfig"
 source "drivers/w1/Kconfig"
 
 source "drivers/power/Kconfig"
+
+source "drivers/battery/Kconfig"
 
 source "drivers/hwmon/Kconfig"
 
@@ -168,6 +172,12 @@ source "drivers/ipack/Kconfig"
 
 source "drivers/reset/Kconfig"
 
+source "drivers/sipc/Kconfig"
+
+source "drivers/sensors/Kconfig"
+
 source "drivers/android/Kconfig"
+
+source "drivers/gpu/ion/Kconfig"
 
 endmenu
