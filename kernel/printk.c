@@ -306,6 +306,31 @@ static u32 log_next(u32 idx)
 	return idx + msg->len;
 }
 
+#ifdef CONFIG_SEC_LOG
+static void (*log_text_hook)(char *text, size_t size);
+static char *seclog_buf;
+static unsigned *seclog_ptr;
+static size_t seclog_size;
+static char sec_text[1024]; /* buffer size: LOG_LINE_MAX + PREFIX_MAX */
+void register_log_text_hook(void (*f)(char *text, size_t size), char * buf,
+	unsigned *position, size_t bufsize)
+{
+	unsigned long flags;
+	raw_spin_lock_irqsave(&logbuf_lock, flags);
+	if (buf && bufsize) {
+		seclog_buf = buf;
+		seclog_ptr = position;
+		seclog_size = bufsize;
+		log_text_hook = f;
+	}
+	raw_spin_unlock_irqrestore(&logbuf_lock, flags);
+}
+EXPORT_SYMBOL(register_log_text_hook);
+static size_t msg_print_text(const struct log *msg, enum log_flags prev,
+			     bool syslog, char *buf, size_t size);
+
+#endif
+
 /* insert record into the buffer, discard old ones, update heads */
 static void log_store(int facility, int level,
 		      enum log_flags flags, u64 ts_nsec,
@@ -361,6 +386,15 @@ static void log_store(int facility, int level,
 		msg->ts_nsec = local_clock();
 	memset(log_dict(msg) + dict_len, 0, pad_len);
 	msg->len = sizeof(struct log) + text_len + dict_len + pad_len;
+
+#ifdef CONFIG_SEC_LOG
+	if (log_text_hook) {
+		size = msg_print_text(msg, msg->flags, true,
+			sec_text, 1024);
+
+		log_text_hook(sec_text, size);
+	}
+#endif
 
 	/* insert message */
 	log_next_idx += msg->len;
