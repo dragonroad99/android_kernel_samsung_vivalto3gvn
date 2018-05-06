@@ -801,6 +801,13 @@ void abort(void)
 }
 EXPORT_SYMBOL(abort);
 
+#if defined(CONFIG_SEC_DEBUG)
+void cp_abort(void)
+{
+    panic("CP Crash");
+}
+#endif
+
 void __init trap_init(void)
 {
 	return;
