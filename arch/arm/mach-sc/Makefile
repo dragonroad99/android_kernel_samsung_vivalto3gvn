@@ -21,8 +21,7 @@ ifeq ($(CONFIG_CPU_IDLE),y)
 endif
 obj-y += dev-bluetooth_bcm4330.o
 ifeq ($(CONFIG_PM),y)
-	obj-$(CONFIG_ARCH_SCX35) += pm-scx35.o standby-scx35.o
-# pm_debug_scx35.o
+	obj-$(CONFIG_ARCH_SCX35) += pm-scx35.o standby-scx35.o pm_debug_scx35.o
 endif
 obj-$(CONFIG_SCX35_DMC_FREQ_AP) += dmc_freq_ap.o
 obj-$(CONFIG_SPRD_DCDC_DEBUG) += dcdc_debug.o
