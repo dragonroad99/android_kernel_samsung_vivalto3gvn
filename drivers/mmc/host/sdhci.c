@@ -838,7 +838,8 @@ static void sdhci_prepare_data(struct sdhci_host *host, struct mmc_command *cmd)
 				WARN_ON(1);
 				host->flags &= ~SDHCI_REQ_USE_DMA;
 			} else {
-				WARN_ON(sg_cnt != 1);
+				//SBSIM : To enhance wifi throuhgput.
+				//WARN_ON(sg_cnt != 1);
 				sdhci_writel(host, sg_dma_address(data->sg),
 					SDHCI_DMA_ADDRESS);
 			}
@@ -1316,8 +1317,6 @@ static void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 
 	sdhci_runtime_pm_get(host);
 
-	present = mmc_gpio_get_cd(host->mmc);
-
 	spin_lock_irqsave(&host->lock, flags);
 
 	WARN_ON(host->mrq != NULL);
@@ -1346,6 +1345,7 @@ static void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	 *     zero: cd-gpio is used, and card is removed
 	 *     one: cd-gpio is used, and card is present
 	 */
+	present = mmc_gpio_get_cd(host->mmc);
 	if (present < 0) {
 		/* If polling, assume that the card is always present. */
 		if (host->quirks & SDHCI_QUIRK_BROKEN_CARD_DETECTION)
@@ -2668,7 +2668,9 @@ int sdhci_runtime_resume_host(struct sdhci_host *host)
 	host->clock = 0;
 	sdhci_do_set_ios(host, &host->mmc->ios);
 
-	sdhci_do_start_signal_voltage_switch(host, &host->mmc->ios);
+	if (!host->mmc->caps2 & MMC_CAP2_BROKEN_VOLTAGE)
+		sdhci_do_start_signal_voltage_switch(host, &host->mmc->ios);
+
 	if ((host_flags & SDHCI_PV_ENABLED) &&
 		!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN)) {
 		spin_lock_irqsave(&host->lock, flags);
