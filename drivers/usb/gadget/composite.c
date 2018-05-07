@@ -19,6 +19,7 @@
 #include <linux/utsname.h>
 
 #include <linux/usb/composite.h>
+#include <linux/usb/gadget_cust.h>
 #include <asm/unaligned.h>
 
 /*
@@ -1494,6 +1495,11 @@ void composite_disconnect(struct usb_gadget *gadget)
 		reset_config(cdev);
 	if (cdev->driver->disconnect)
 		cdev->driver->disconnect(cdev);
+	if (cdev->delayed_status !=0) {
+		INFO(cdev,"delayed status mismatch .. resetting\n");
+		cdev->delayed_status = 0;
+	}
+
 	spin_unlock_irqrestore(&cdev->lock, flags);
 }
 
