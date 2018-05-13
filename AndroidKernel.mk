@@ -1,10 +1,11 @@
 KERNEL_OUT ?= $(OUT)/obj/KERNEL_OBJ
-KERNEL_DEFCONFIG ?= cyanogen_vivalto3gvn_defconfig
+KERNEL_DEFCONFIG ?= lineageos_vivalto3gvn_defconfig
 KERNEL_CONFIG := $(KERNEL_OUT)/.config
 
 TARGET_KERNEL_SOURCE ?= $(PWD)
 
-CCACHE ?= $(TARGET_KERNEL_SOURCE)/../../../prebuilts/misc/linux-x86/ccache/ccache
+#CCACHE ?= $(TARGET_KERNEL_SOURCE)/../../../prebuilts/misc/linux-x86/ccache/ccache
+CCACHE ?= ccache
 
 ifeq ($(USES_UNCOMPRESSED_KERNEL),true)
 TARGET_PREBUILT_KERNEL := $(KERNEL_OUT)/arch/arm/boot/Image
@@ -24,4 +25,4 @@ $(KERNEL_CONFIG): $(TARGET_KERNEL_SOURCE)/arch/arm/configs/$(KERNEL_DEFCONFIG)
 	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) arm-eabi-" $(KERNEL_DEFCONFIG)
 
 $(TARGET_PREBUILT_KERNEL): kernelheader $(KERNEL_OUT) $(KERNEL_CONFIG)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) arm-eabi-" zImage -j4
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) arm-eabi-" -j4 zImage
