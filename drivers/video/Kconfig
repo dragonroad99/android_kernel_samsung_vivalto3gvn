@@ -23,6 +23,10 @@ source "drivers/gpu/drm/Kconfig"
 
 source "drivers/gpu/host1x/Kconfig"
 
+source "drivers/gpu/ion/Kconfig"
+
+source "drivers/gpu/sprd_iommu/Kconfig"
+
 config VGASTATE
        tristate
        default n
@@ -2476,6 +2480,7 @@ source "drivers/video/exynos/Kconfig"
 source "drivers/video/mmp/Kconfig"
 source "drivers/video/backlight/Kconfig"
 source "drivers/video/adf/Kconfig"
+source "drivers/video/sprdfb/Kconfig"
 
 if VT
 	source "drivers/video/console/Kconfig"
