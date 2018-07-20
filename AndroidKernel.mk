@@ -4,8 +4,9 @@ KERNEL_CONFIG := $(KERNEL_OUT)/.config
 
 TARGET_KERNEL_SOURCE ?= $(PWD)
 
-#CCACHE ?= $(TARGET_KERNEL_SOURCE)/../../../prebuilts/misc/linux-x86/ccache/ccache
+#CCACHE ?= $(ANDROID_BUILD_TOP)/prebuilts/misc/linux-x86/ccache/ccache
 CCACHE ?= ccache
+KERNEL_TOOLCHAIN ?= $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin
 
 ifeq ($(USES_UNCOMPRESSED_KERNEL),true)
 TARGET_PREBUILT_KERNEL := $(KERNEL_OUT)/arch/arm/boot/Image
@@ -16,13 +17,13 @@ endif
 all: $(TARGET_PREBUILT_KERNEL)
 
 kernelheader: $(KERNEL_OUT)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) arm-eabi-" headers_install
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) $(KERNEL_TOOLCHAIN)/arm-eabi-" headers_install
 
 $(KERNEL_OUT):
 	mkdir -p $(KERNEL_OUT)
 
 $(KERNEL_CONFIG): $(TARGET_KERNEL_SOURCE)/arch/arm/configs/$(KERNEL_DEFCONFIG)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) arm-eabi-" $(KERNEL_DEFCONFIG)
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) $(KERNEL_TOOLCHAIN)/arm-eabi-" $(KERNEL_DEFCONFIG)
 
 $(TARGET_PREBUILT_KERNEL): kernelheader $(KERNEL_OUT) $(KERNEL_CONFIG)
-	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) arm-eabi-" -j4 zImage
+	$(MAKE) -C $(TARGET_KERNEL_SOURCE) O=$(KERNEL_OUT) ARCH=arm CROSS_COMPILE="$(CCACHE) $(KERNEL_TOOLCHAIN)/arm-eabi-" -j4 zImage
